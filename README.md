@@ -1,110 +1,100 @@
-# RxjsOperators
+# rxjs-operators
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+A collection of small, strongly typed RxJS pipeable operators, each published as its own npm package.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.
+## Packages
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+| Package                                         | Description                                                     |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| [`or-empty-array`](packages/or-empty-array)     | Converts `null` / `undefined` emissions into an empty array `[]` |
 
-## Generate a library
+```typescript
+import { of } from 'rxjs';
+import { orEmptyArray } from 'or-empty-array';
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
+of<string[] | null>(null).pipe(orEmptyArray()).subscribe(console.log); // []
 ```
 
-## Run tasks
+See each package's README for full documentation.
 
-To build the library use:
+## Requirements
 
-```sh
-npx nx build pkg1
+- Node.js 20+
+- npm (workspaces)
+- `rxjs` >= 7 as a peer dependency in consuming projects
+
+## Getting started
+
+```bash
+npm install
 ```
 
-To run any task with Nx use:
-
-```sh
-npx nx <target> <project-name>
-```
-
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
-
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Versioning and releasing
-
-To version and release the library use
+## Workspace structure
 
 ```
-npx nx release
+packages/
+  or-empty-array/     # one folder per operator / npm package
+    src/
+      index.ts        # public API
+      lib/            # implementation + *.spec.ts tests
 ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+The repository is an [Nx](https://nx.dev) workspace: `build`, `test` and `typecheck` targets are inferred automatically from each package's `tsconfig.lib.json` and `jest.config.cts`.
 
-[Learn more about Nx release &raquo;](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Common commands
 
-## Keep TypeScript project references up to date
+| Command                              | What it does                                   |
+| ------------------------------------ | ---------------------------------------------- |
+| `npm run build`                      | Build all packages                             |
+| `npm test`                           | Run all tests                                  |
+| `npx nx build <package>`             | Build a single package                         |
+| `npx nx test <package>`              | Test a single package                          |
+| `npm run build:or-empty-array`       | Build `or-empty-array`                         |
+| `npm run publish:or-empty-array`     | Build and publish `or-empty-array` to npm      |
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+## Publishing
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
+1. Log in to npm (once):
+   ```bash
+   npm login
+   npm whoami
+   ```
+2. Bump the version:
+   ```bash
+   npm version patch -w or-empty-array   # or minor / major
+   ```
+3. Build and publish:
+   ```bash
+   npm run publish:or-empty-array
+   ```
+   With 2FA enabled: `npm run publish:or-empty-array -- --otp=123456`.
 
-```sh
-npx nx sync
+To check what would be published without publishing:
+
+```bash
+npm run build:or-empty-array
+npm publish -w or-empty-array --dry-run
 ```
 
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
+### Local registry (Verdaccio)
 
-```sh
-npx nx sync:check
+To test a package locally before publishing to npm:
+
+```bash
+npx nx run @rxjs-operators/source:local-registry             # starts Verdaccio on http://localhost:4873
+npm publish -w or-empty-array --registry http://localhost:4873
 ```
 
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
+## Adding a new operator
 
-## Set up CI!
+1. Generate a new library:
+   ```bash
+   npx nx g @nx/js:lib packages/<name> --publishable --importPath=<name> --unitTestRunner=jest
+   ```
+2. Implement the operator in `packages/<name>/src/lib/` and export it from `src/index.ts`.
+3. Add `rxjs` as a `peerDependency` in the package's `package.json`.
+4. Add `build:<name>` and `publish:<name>` scripts to the root `package.json`, following the `or-empty-array` ones.
 
-### Step 1
+## License
 
-To connect to Nx Cloud, run the following command:
-
-```sh
-npx nx connect
-```
-
-Connecting to Nx Cloud ensures a [fast and scalable CI](https://nx.dev/ci/intro/why-nx-cloud?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) pipeline. It includes features such as:
-
-- [Remote caching](https://nx.dev/ci/features/remote-cache?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task distribution across multiple machines](https://nx.dev/ci/features/distribute-task-execution?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Automated e2e test splitting](https://nx.dev/ci/features/split-e2e-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Task flakiness detection and rerunning](https://nx.dev/ci/features/flaky-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-### Step 2
-
-Use the following command to configure a CI workflow for your workspace:
-
-```sh
-npx nx g ci-workflow
-```
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+MIT © Giovanni Venturelli

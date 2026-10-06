@@ -1,0 +1,40 @@
+{
+  "name": "or-empty-array",
+  "version": "1.0.0",
+  "description": "RxJS pipeable operator that converts null or undefined values to an empty array",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "!**/*.tsbuildinfo"
+  ],
+  "peerDependencies": {
+    "rxjs": "^7.0.0 || ^8.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "keywords": [
+    "rxjs",
+    "operator",
+    "pipeable",
+    "empty-array",
+    "or-empty-array",
+    "null",
+    "undefined",
+    "array"
+  ],
+  "author": "Giovanni Venturelli",
+  "license": "MIT"
+}
